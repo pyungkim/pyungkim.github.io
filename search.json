@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Pyung Kim",
+    "section": "",
+    "text": "par(family=\"Palatino\")\nplot(iris, pch=20, cex=.75, col=\"steelblue\")"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "1 + 1\n\n[1] 2"
+  }
+]
