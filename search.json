@@ -1,16 +1,58 @@
 [
   {
+    "objectID": "research.html",
+    "href": "research.html",
+    "title": "Research",
+    "section": "",
+    "text": "1. Pyung Kim, & Bae, H. (2022). \"Do firms respond differently to the carbon pricing by industrial sector? How and why? A comparison between manufacturing and electricity generation sectors using firm-level panel data in Korea\". Energy Policy, 162, 112773. (IF=7.576, 95% in Economics) https://www.sciencedirect.com/science/article/abs/pii/S030142152100639X"
+  },
+  {
+    "objectID": "research.html#publications-in-refereed-journal-in-korean",
+    "href": "research.html#publications-in-refereed-journal-in-korean",
+    "title": "Research",
+    "section": "Publications in Refereed Journal (In Korean)",
+    "text": "Publications in Refereed Journal (In Korean)\n2. Han, M., & Pyung Kim (2022). \"Analysis of Factors Affecting Corporate Participation in Carbon Disclosure Project\". GRI Review, 24(1), 181-209.\n1. Pyung Kim, & Kim, S. (2017). \"Analyzing the Opposition to Nuclear Power Energy on the Internet - Focusing on the Moderating Effect of Policy Efficacy\". Crisisonomy, 13(3), 1-15."
+  },
+  {
+    "objectID": "research.html#working-papers",
+    "href": "research.html#working-papers",
+    "title": "Research",
+    "section": "Working Papers",
+    "text": "Working Papers\n5. A Study on International Standards of SW Safety Assessment and Legal Arrangement of Domestic and Foreign Countries\n\nResearch Assistant at Korea Institute of Public Administration (Aug 2020 – Nov 2020)\nFunded by Software Policy & Research Institute under the Korea Ministry of Science and ICT\n\n4. An Analysis of the Local Government Social Welfare Budget\n\nGraduate Researcher at Yonsei University (Jul 2018 – Aug 2018)\nFunded by Korea Ministry of Health and Welfare\n\n3. Analysis of national distrust structure of nuclear safety regulations and development of risk communication strategies for recovering trust\n\nGraduate Researcher at Ajou University (Mar 2016 – Aug 2016)\nFunded by Korea Foundation of Nuclear Safety\n\n2. Track and analyze the performance of technological development project for original research\n\nGraduate Researcher at Ajou University (Jul 2015 – Aug 2015)\nFunded by National Research Foundation of Korea\n\n1. Analysis of national distrust structure of nuclear safety regulations and development of risk communication strategies for recovering trust\n\nGraduate Researcher at Ajou University (Jan 2015 – Aug 2015)\nFunded by Korea Foundation of Nuclear Safety"
+  },
+  {
+    "objectID": "research.html#conference-presentations",
+    "href": "research.html#conference-presentations",
+    "title": "Research",
+    "section": "Conference Presentations",
+    "text": "Conference Presentations\n9. Think Globally, Act Locally? Role of Global Identity in Tackling Climate Change. 2022 Asian Conference on Crisisonomy. (20 - 23 Jul 2022, Jeju, Korea)\n8. Why Companies Voluntarily Disclose Environmental Information?. The Association for Research on Nonprofit Organizations and Voluntary Action (17 – 18 Jul 2021, Online)\n7. An Analysis of the Determinants and Impacts of Digital Divide. The Korean Association for Policy Studies Annual Conference (4 Dec 2020, Online)\n6. Information Disclosure as a Policy Tool: A Comparative Case Study of the Toxic Release Inventory (TRI) program in the United States and South Korea. The 5th National Conference of Graduate Students in Public Administration (10 May 2019, Seoul, Korea)\n5. An Analysis of the Institutionalization Process of the 4th Industrial Revolution in South Korea: Historical Context, Political Situation, and Strategic Behavior of Bureaucrats. The 5th National Conference of Graduate Students in Public Administration (10 May 2019, Seoul, Korea)\n4. Impact of Goal Clarity on Corporate Environmental Performance: Focusing on the Voluntary Environmental Programs. The Korean Association for Local Government Studies Annual (9 Nov 2018, Busan, Korea)\n3. Does Experience Affect Judgement? Analyzing the Impact of Online Experience on Nuclear Risk Perception. 26th Society for Risk Analysis (SRA) – Europe Annual Conference (19 – 21 June 2017, Lisbon, Portugal)\n2. Who Are the Active Netizens? Focusing on The Role of the Policy Efficacy. 2016 International Conference on Information and Social Science (24 – 26 June 2016, Sapporo, Japan)\n1. An Analysis of Perceived Health by Local Residents around Nuclear Power Station. 2015 International Conference on Information and Social Science (5 – 7 Aug 2015, Fukuoka, Japan)"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Pyung Kim",
     "section": "",
-    "text": "par(family=\"Palatino\")\nplot(iris, pch=20, cex=.75, col=\"steelblue\")"
+    "text": "I am a Ph.D. candidate and Brain Berry J.L. Scholar at the School of Economic, Political, and Policy Sciences (EPPS) at the University of Texas at Dallas.\nI research the intersection of applied econometrics and machine learning to strengthen causal inference. I also utilize GIS (Geographic Information System) to identify demands for policy intervention and provide an optimal allocation of public service. Areas of research topics include energy policy, environmental policy, and health policy aiming at tackling climate change and improving public health."
   },
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "1 + 1\n\n[1] 2"
+    "objectID": "index.html#interests",
+    "href": "index.html#interests",
+    "title": "Pyung Kim",
+    "section": "Interests",
+    "text": "Interests\n\nApplied Econometrics\nSpatial Statistics and GIS\nMachine Learning\nEnergy and Environmental Policy\nHealth Policy"
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "Pyung Kim",
+    "section": "Education",
+    "text": "Education\n\nMaster’s in Public Administration, 2020\n\nYonsei University\nBrain Korea 21 PLUS Scholarship (funded by National Research Foundation of Korea), Mar 2018 – Feb 2020\n\nBachelor’s in Public Administration, 2018\n\nAjou University (Graduate with Summa Cum Laude)\nThe Next Century Humanities Scholarship (funded by Korea Student Aid Foundation), Sept 2014 – Feb 2018"
+  },
+  {
+    "objectID": "index.html#contact-me",
+    "href": "index.html#contact-me",
+    "title": "Pyung Kim",
+    "section": "Contact Me",
+    "text": "Contact Me\nPyung.Kim@UTDallas.edu\nGoogle Scholar\nLinkedin"
   }
 ]
