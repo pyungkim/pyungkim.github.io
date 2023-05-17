@@ -1,0 +1,31 @@
+---
+title: "Funded Project"
+---
+
+1.  Geospatial Community Mapping to Assess Social and Environmental Barriers and Facilitators for Burn Survivors
+
+    *Funded by National Institute on Disability, Independent Living, and Rehabilitation Research (NIDILRR), Administration for Community Living, US Department of Health and Human Services*
+
+    *USD 483,532 (with UT Southwestern Medical Center)*
+
+    *Karen Kowalske (PI at UTSW), Dohyeong Kim (PI at UTD), Richard Scotch (Co-PI at UTD)*
+
+2.  "A Study on International Standards of SW Safety Assessment and Legal Arrangement of Domestic and Foreign Countries"
+
+    *Funded by Software Policy & Research Institute under the Korea Ministry of Science and ICT (Aug 2020 -- Nov 2020)*
+
+3.  "An Analysis of the Local Government Social Welfare Budget"
+
+    *Funded by Korea Ministry of Health and Welfare (Jul 2018 -- Aug 2018)*
+
+4.  "Analysis of national distrust structure of nuclear safety regulations and development of risk communication strategies for recovering trust"
+
+    *Funded by Korea Foundation of Nuclear Safety (Mar 2016 \-- Aug 2016)*
+
+5.  "Track and analyze the performance of technological development project for original research"
+
+    *Funded by National Research Foundation of Korea (Jul 2015 -- Aug 2015)*
+
+6.  "Analysis of national distrust structure of nuclear safety regulations and development of risk communication strategies for recovering trust"
+
+    *Funded by Korea Foundation of Nuclear Safety (Jan 2015 \-- Aug 2015)*

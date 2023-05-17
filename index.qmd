@@ -1,0 +1,29 @@
+---
+title: "Pyung Kim"
+---
+
+###### 
+
+![](profile.png){fig-align="center" width="336"}
+
+I am a Ph.D. candidate in Public Policy and Political Economy at the University of Texas at Dallas with Brian J.L. Berry Scholarship, the highest honor of the doctoral program. My research is dedicated to the reduction of health inequalities, the advancement of disability inclusion, and the cultivation of a decarbonized economy. Leveraging GIS and spatial statistics, I examine disease and injury patterns, thereby identifying regions in need of policy intervention. Additionally, I am strongly interested in the intersection of econometrics and machine learning as tools for estimating policy impacts.
+
+Before joining UT Dallas, I was a research assistant at the Korea Institute of Public Administration, a national think tank under the Prime Minister's Office. I earned my B.A. in Public Administration at Ajou University with the highest honor and completed my MPA at Yonsei University in South Korea. Throughout my educational journey, I have received numerous merit-based scholarships from esteemed institutions, including the National Research Foundation of Korea, the Korea Student Aid Foundation, Ajou University, Yonsei University, and UT Dallas.
+
+###### 
+
+### Research Interests
+
+-   Health Policy
+-   Climate Policy
+-   Spatial Econometrics and GIS
+-   Spatial Epidemiology
+-   Causal Inference
+
+### 
+
+### Contact Me
+
+[**pyung.kim\@utdallas.edu**](mailto:Pyung.Kim@UTDallas.edu)\
+[**Google Scholar**](https://scholar.google.com/citations?user=qx0qK5MAAAAJ&hl=ko&authuser=1)\
+[**Linkedin**](https://www.linkedin.com/in/pyung-kim-347197211/)
