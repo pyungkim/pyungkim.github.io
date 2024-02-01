@@ -3,27 +3,33 @@ title: "Publication"
 editor: visual
 ---
 
-### Publications in Refereed Journal
+### First Author Publication
 
-1.  Maxwell, S. P., Brooks, C., **Pyung Kim**, Kim, D., McNeely, C. L., & Thomas, K. (2023). Understanding Habitats and Environmental Conditions of White-Tailed Deer Population Density and Public Health Data to Aid in Assessing Human Tick-Borne Disease Risk. *Microorganisms*, 11(4), 865.
-
-2.  **Pyung Kim**, & Bae, H. (2022). "Do firms respond differently to the carbon pricing by industrial sector? How and why? A comparison between manufacturing and electricity generation sectors using firm-level panel data in Korea". *Energy Policy*, 162, 112773. [**https://www.sciencedirect.com/science/article/abs/pii/S030142152100639X**](https://www.sciencedirect.com/science/article/abs/pii/S030142152100639X)
+1.  **Kim, P.** & Bae, H. (2022). Do firms respond differently to the carbon pricing by industrial sector? How and why? A comparison between manufacturing and electricity generation sectors using firm-level panel data in Korea".??*Energy Policy*,??162, 112773. <https://doi.org/10.1016/j.enpol.2021.112773>. (IF=9.0, 98.0% in Economics, h5-index=123)
 
 ###### 
+
+### Co-author Author Publications
+
+1.  Hong, S., Jeong, D., & **Kim, P.** (2024). Have offender demographics changed since the COVID-19 Pandemic? Evidence from money mules in South Korea. *Journal of Criminal Justice*. <https://doi.org/10.1016/j.jcrimjus.2024.102156>. (IF=5.5, 93.6% in Criminology & Penology, h5-index=38)
+
+2.  Maxwell, S. P., Brooks, C., **Kim, P.**, Kim, D., McNeely, C. L., & Thomas, K. (2023). Understanding Habitats and Environmental Conditions of White-Tailed Deer Population Density and Public Health Data to Aid in Assessing Human Tick-Borne Disease Risk. *Microorganisms*, 11(4), 865. <https://doi.org/10.3390/microorganisms11040865>. (IF=4.5, 65.6% in Microbiology, h5-index=84)
 
 ### Publications in Refereed Journal (In Korean)
 
-1.  Han, M., & **Pyung Kim** (2022). "Analysis of Factors Affecting Corporate Participation in Carbon Disclosure Project (CDP): Organizational Institutionalism Perspective". *GRI Review*, 24(1), 181-209.
-2.  **Pyung Kim**, & Kim, S. (2017). "Analyzing the Opposition to Nuclear Power Energy on the Internet - Focusing on the Moderating Effect of Policy Efficacy". *Crisisonomy*, 13(3), 1-15.
+1.  Han, M., & **Kim, P.** (2022). Analysis of factors affecting corporate participation in Carbon Disclosure Project (CDP): Organizational Institutionalism perspective. *GRI Review,* 24(1), 181-209.
 
-###### 
+2.  **Kim, P.**, & Kim, S. (2017). Analyzing the Opposition to Nuclear Power Energy on the Internet - Focusing on the Moderating Effect of Policy Efficacy. *Crisisonomy*, 13(3), 1-15
 
-### Work in Progress
+### Under Review
 
-1.  "Using deep learning to identify asthmatic children who are sensitive to PM exposure: The road to personalized risk prediction and intervention" (with Dohyeong Kim)
+1.  "Using Deep Learning to Identify Asthmatic Children Who Are Sensitive to PM Exposure: The Road to Personalized Risk Prediction and Intervention" (with Jooyi Jung, Choongki Min, Hyoungshin Choi, Dohyeong Kim, Pranav Kumar, Jeongeun Hwang, and Daejin Song)\\
+2.  "Targeted Tick-Borne Disease Recognition: Assessing Risk for Improved and Equitable Public Health" (with Sarah Maxwell, Nabila Parijat, Dohyeong Kim, and Connie McNeely)
 
-2.  "Burn Injury Survivors as Overlooked Health Disparity: Assessing Spatial Factors for Burn Injury Survivors' Community Reintegration in Texas" (with Dohyeong Kim, Richard Scotch, Karen Kowalske, and Dohyo Jeong)
+### Working Papers
 
-3.  "From Stick to Carrot: The Effects of Carbon Pricing Policy on Firm Environmental Performance in South Korea"
+1.  "From Stick to Carrot: The Effects of Carbon Pricing Policy on Firm Environmental Performance in South Korea"
 
-4.  "The Effect of Social Distancing Policies on Mobility in the US during the COVID-19 Pandemic" (with Dohyeong Kim)
+2.  "The Effect of Social Distancing Policies on Mobility in the US during the COVID-19 Pandemic"
+
+3.  "Burn Injury Survivors as Overlooked Health Disparity: Assessing Spatial Factors for Burn Injury Survivors' Community Reintegration" (with Dohyeong Kim, Richard Scotch, Karen Kowalske, Dohyo Jeong, Kyra Solis, and Nabeeha Hassan)
