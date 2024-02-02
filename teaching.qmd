@@ -10,10 +10,12 @@ editor: visual
     -   Korea Social Science Data Archive (Summer 2023)
     -   Rating: 9.84/10
 
--   **Introductory GIS and Spatial Statistics**
+-   **Introductory GIS and Spatial Statistics (graduate)**
 
     -   Korea Social Science Data Archive (Summer 2023)
     -   Rating: 9.54/10
+
+###### 
 
 ### Teaching Assistant
 

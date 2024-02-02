@@ -5,7 +5,7 @@ editor: visual
 
 ### First Author Publication
 
-1.  **Kim, P.** & Bae, H. (2022). Do firms respond differently to the carbon pricing by industrial sector? How and why? A comparison between manufacturing and electricity generation sectors using firm-level panel data in Korea".??*Energy Policy*,??162, 112773. <https://doi.org/10.1016/j.enpol.2021.112773>. (IF=9.0, 98.0% in Economics, h5-index=123)
+1.  **Kim, P.** & Bae, H. (2022). Do firms respond differently to the carbon pricing by industrial sector? How and why? A comparison between manufacturing and electricity generation sectors using firm-level panel data in Korea". *Energy Policy*, 162, 112773. <https://doi.org/10.1016/j.enpol.2021.112773>. (IF=9.0, 98.0% in Economics, h5-index=123)
 
 ###### 
 
@@ -15,16 +15,22 @@ editor: visual
 
 2.  Maxwell, S. P., Brooks, C., **Kim, P.**, Kim, D., McNeely, C. L., & Thomas, K. (2023). Understanding Habitats and Environmental Conditions of White-Tailed Deer Population Density and Public Health Data to Aid in Assessing Human Tick-Borne Disease Risk. *Microorganisms*, 11(4), 865. <https://doi.org/10.3390/microorganisms11040865>. (IF=4.5, 65.6% in Microbiology, h5-index=84)
 
-### Publications in Refereed Journal (In Korean)
+###### 
+
+### Publications in Korean
 
 1.  Han, M., & **Kim, P.** (2022). Analysis of factors affecting corporate participation in Carbon Disclosure Project (CDP): Organizational Institutionalism perspective. *GRI Review,* 24(1), 181-209.
 
-2.  **Kim, P.**, & Kim, S. (2017). Analyzing the Opposition to Nuclear Power Energy on the Internet - Focusing on the Moderating Effect of Policy Efficacy. *Crisisonomy*, 13(3), 1-15
+2.  **Kim, P.**, & Kim, S. (2017). Analyzing the Opposition to Nuclear Power Energy on the Internet - Focusing on the Moderating Effect of Policy Efficacy. *Crisisonomy*, 13(3), 1-15.
+
+###### 
 
 ### Under Review
 
-1.  "Using Deep Learning to Identify Asthmatic Children Who Are Sensitive to PM Exposure: The Road to Personalized Risk Prediction and Intervention" (with Jooyi Jung, Choongki Min, Hyoungshin Choi, Dohyeong Kim, Pranav Kumar, Jeongeun Hwang, and Daejin Song)\\
+1.  "Using Deep Learning to Identify Asthmatic Children Who Are Sensitive to PM Exposure: The Road to Personalized Risk Prediction and Intervention" (with Jooyi Jung, Choongki Min, Hyoungshin Choi, Dohyeong Kim, Pranav Kumar, Jeongeun Hwang, and Daejin Song)
 2.  "Targeted Tick-Borne Disease Recognition: Assessing Risk for Improved and Equitable Public Health" (with Sarah Maxwell, Nabila Parijat, Dohyeong Kim, and Connie McNeely)
+
+###### 
 
 ### Working Papers
 
