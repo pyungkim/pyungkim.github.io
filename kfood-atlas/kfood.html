@@ -81,6 +81,8 @@
     .hm-cart{width:26px;height:26px;border-radius:7px;background:var(--brand);border:2px solid #fff;box-shadow:0 2px 5px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center}
     .hm-cart svg{width:15px;height:15px;fill:#fff;display:block}
     .hm-cart.soon{background:#98a2b3}
+    .kr-rice{width:23px;height:23px;border-radius:50%;background:#fff;border:1.5px solid #2563eb;
+      box-shadow:0 1px 3px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
     .hm-pin{position:relative;width:30px;height:42px}
     .hm-pin .drop{position:absolute;left:3px;top:0;width:24px;height:24px;border-radius:50% 50% 50% 2px;transform:rotate(45deg);background:#1f2a44;border:3px solid #fff;box-shadow:0 3px 7px rgba(16,24,40,.45);z-index:2}
     .hm-pin .drop::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#fff}
@@ -230,6 +232,7 @@
     html:`<div class="hm-cart ${open?'':'soon'}">${CART_SVG}</div>`}); }
   const searchPin = L.divIcon({className:"",iconSize:[30,42],iconAnchor:[15,40],popupAnchor:[0,-38],
     html:`<div class="hm-pin"><div class="ring"></div><div class="drop"></div></div>`});
+  const riceIcon = L.divIcon({className:"kr-rice",iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-13],html:"🍚"});
 
   // ===== Map ================================================================
   const CONUS=[[24.4,-124.8],[49.4,-66.9]];
@@ -284,8 +287,8 @@
 
   function loadPoints(){
     fetch("data/restaurants.geojson").then(r=>r.json()).then(g=>{
-      restLayer=L.geoJSON(g,{renderer:restRenderer,pane:"markerPane",
-        pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:"#2563eb",color:"#fff",weight:1,fillOpacity:0.95}),
+      restLayer=L.geoJSON(g,{pane:"markerPane",
+        pointToLayer:(f,ll)=>L.marker(ll,{icon:riceIcon,keyboard:false,riseOnHover:true}),
         onEachFeature:(f,l)=>l.bindPopup(`<b>${f.properties.name}</b><br><span style="color:#5c6773">Korean restaurant</span>`)});
       if(TAB==="rest" && document.getElementById("ptToggle").checked) restLayer.addTo(map);
     });
