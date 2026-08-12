@@ -83,6 +83,8 @@
     .hm-cart.soon{background:#98a2b3}
     .kr-rice{width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid #2563eb;
       box-shadow:0 1px 3px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
+    /* larger invisible tap target around the 20px badge (easier on touch) */
+    .kr-rice-hit{width:32px;height:32px;display:flex;align-items:center;justify-content:center}
     .hm-pin{position:relative;width:30px;height:42px}
     .hm-pin .drop{position:absolute;left:3px;top:0;width:24px;height:24px;border-radius:50% 50% 50% 2px;transform:rotate(45deg);background:#1f2a44;border:3px solid #fff;box-shadow:0 3px 7px rgba(16,24,40,.45);z-index:2}
     .hm-pin .drop::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#fff}
@@ -232,7 +234,7 @@
     html:`<div class="hm-cart ${open?'':'soon'}">${CART_SVG}</div>`}); }
   const searchPin = L.divIcon({className:"",iconSize:[30,42],iconAnchor:[15,40],popupAnchor:[0,-38],
     html:`<div class="hm-pin"><div class="ring"></div><div class="drop"></div></div>`});
-  const riceIcon = L.divIcon({className:"kr-rice",iconSize:[20,20],iconAnchor:[10,10],popupAnchor:[0,-11],html:"🍚"});
+  const riceIcon = L.divIcon({className:"kr-rice-hit",iconSize:[32,32],iconAnchor:[16,16],popupAnchor:[0,-13],html:'<div class="kr-rice">🍚</div>'});
 
   // ===== Map ================================================================
   const CONUS=[[24.4,-124.8],[49.4,-66.9]];
@@ -285,27 +287,48 @@
     setTab(TAB); fadeOut(); loadPoints();
   }).catch(e=>{ loadmsg.textContent="Failed to load data: "+e; console.error(e); });
 
+  // Restaurants (~2,300) are too many DOM markers for mobile. Render only the
+  // rice markers currently in view, and only once zoomed in — keeps the DOM
+  // node count to a few hundred so panning/zooming stays smooth.
+  let restData=[]; const restGroup=L.layerGroup();
+  const REST_MINZOOM=7, REST_CAP=500;
   function loadPoints(){
     fetch("data/restaurants.geojson").then(r=>r.json()).then(g=>{
-      restLayer=L.geoJSON(g,{pane:"markerPane",
-        pointToLayer:(f,ll)=>L.marker(ll,{icon:riceIcon,keyboard:false,riseOnHover:true}),
-        onEachFeature:(f,l)=>l.bindPopup(`<b>${f.properties.name}</b><br><span style="color:#5c6773">Korean restaurant</span>`)});
-      if(TAB==="rest" && document.getElementById("ptToggle").checked) restLayer.addTo(map);
+      restData=g.features.map(f=>({lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0],name:f.properties.name}));
+      updateRest();
     });
     fetch("data/stores.geojson").then(r=>r.json()).then(g=>{
       storeLayer=L.geoJSON(g,{pane:"markerPane",
         pointToLayer:(f,ll)=>L.marker(ll,{icon:storeIcon(f.properties.status==="open"),keyboard:false,riseOnHover:true}),
         onEachFeature:(f,l)=>{const p=f.properties;const s=p.status!=="open"?' <em>(coming soon)</em>':'';
           l.bindPopup(`<b>H Mart ${p.name}</b>${s}<br>${p.street?p.street+"<br>":""}${p.city}, ${p.state} ${p.zip}`);}});
-      if(TAB==="hmart" && document.getElementById("ptToggle").checked) storeLayer.addTo(map);
+      refreshPoints();
     });
   }
-  function activePointLayer(){ return TAB==="rest"?restLayer:storeLayer; }
+  function restOn(){ return TAB==="rest" && document.getElementById("ptToggle").checked; }
+  function updateRest(){
+    const lbl=document.getElementById("ptLabel");
+    if(lbl && TAB==="rest") lbl.textContent = (restOn() && map.getZoom()<REST_MINZOOM) ? "Restaurants — zoom in ↑" : "Show restaurants";
+    restGroup.clearLayers();
+    if(!restOn()){ if(map.hasLayer(restGroup)) map.removeLayer(restGroup); return; }
+    if(!map.hasLayer(restGroup)) restGroup.addTo(map);
+    if(map.getZoom() < REST_MINZOOM) return;   // zoomed out: the choropleth already shows density
+    const b=map.getBounds().pad(0.25); let n=0;
+    for(const r of restData){
+      if(b.contains([r.lat,r.lng])){
+        L.marker([r.lat,r.lng],{icon:riceIcon,keyboard:false,pane:"markerPane"})
+          .bindPopup(`<b>${r.name}</b><br><span style="color:#5c6773">Korean restaurant</span>`).addTo(restGroup);
+        if(++n>=REST_CAP) break;
+      }
+    }
+  }
   function refreshPoints(){
-    [restLayer,storeLayer].forEach(l=>{ if(l&&map.hasLayer(l)) map.removeLayer(l); });
-    const l=activePointLayer(); if(l && document.getElementById("ptToggle").checked) l.addTo(map);
+    if(storeLayer){ if(TAB==="hmart" && document.getElementById("ptToggle").checked) storeLayer.addTo(map);
+                    else if(map.hasLayer(storeLayer)) map.removeLayer(storeLayer); }
+    updateRest();
   }
   document.getElementById("ptToggle").addEventListener("change",refreshPoints);
+  map.on("moveend zoomend", updateRest);
 
   // ===== Tabs, metric, radius ==============================================
   const radiusBox=document.getElementById("radiusBox"), radiusSeg=document.getElementById("radiusSeg");
