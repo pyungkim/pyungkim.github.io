@@ -306,19 +306,22 @@
     });
   }
   function restOn(){ return TAB==="rest" && document.getElementById("ptToggle").checked; }
+  function bigScreen(){ return window.innerWidth >= 900; }  // desktop: show all zooms; mobile: cull
   function updateRest(){
+    const minZoom = bigScreen() ? 0 : REST_MINZOOM;   // 0 = never hide on desktop
+    const cap     = bigScreen() ? 4000 : REST_CAP;    // desktop shows all ~2,300
     const lbl=document.getElementById("ptLabel");
-    if(lbl && TAB==="rest") lbl.textContent = (restOn() && map.getZoom()<REST_MINZOOM) ? "Restaurants — zoom in ↑" : "Show restaurants";
+    if(lbl && TAB==="rest") lbl.textContent = (restOn() && map.getZoom()<minZoom) ? "Restaurants — zoom in ↑" : "Show restaurants";
     restGroup.clearLayers();
     if(!restOn()){ if(map.hasLayer(restGroup)) map.removeLayer(restGroup); return; }
     if(!map.hasLayer(restGroup)) restGroup.addTo(map);
-    if(map.getZoom() < REST_MINZOOM) return;   // zoomed out: the choropleth already shows density
+    if(map.getZoom() < minZoom) return;
     const b=map.getBounds().pad(0.25); let n=0;
     for(const r of restData){
       if(b.contains([r.lat,r.lng])){
         L.marker([r.lat,r.lng],{icon:riceIcon,keyboard:false,pane:"markerPane"})
           .bindPopup(`<b>${r.name}</b><br><span style="color:#5c6773">Korean restaurant</span>`).addTo(restGroup);
-        if(++n>=REST_CAP) break;
+        if(++n>=cap) break;
       }
     }
   }
@@ -329,6 +332,7 @@
   }
   document.getElementById("ptToggle").addEventListener("change",refreshPoints);
   map.on("moveend zoomend", updateRest);
+  window.addEventListener("resize", updateRest);
 
   // ===== Tabs, metric, radius ==============================================
   const radiusBox=document.getElementById("radiusBox"), radiusSeg=document.getElementById("radiusSeg");
