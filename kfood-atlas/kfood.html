@@ -87,10 +87,37 @@
     .hm-pin .ring{position:absolute;left:5px;top:26px;width:20px;height:8px;border-radius:50%;background:rgba(31,42,68,.28);z-index:1;animation:pulse 1.8s ease-out infinite}
     @keyframes pulse{0%{transform:scale(.5);opacity:.7}100%{transform:scale(1.6);opacity:0}}
 
-    @media (max-width:640px){
-      .infocard{top:auto;bottom:96px;right:14px;width:calc(100% - 28px);max-width:none}
-      .search input{width:130px}
-      .legend{bottom:14px;transform:scale(.92);transform-origin:left bottom}
+    @media (max-width:760px){
+      /* top: compact, full-width, stacked */
+      .topbar{top:8px;left:8px;right:8px;max-width:none;flex-direction:column;gap:8px}
+      .brand{width:100%;padding:8px 12px}
+      .brand h1{font-size:15px;margin-bottom:6px}
+      .tabs{width:100%}
+      .tabs button{flex:1;text-align:center;font-size:12px;padding:6px 4px;white-space:nowrap}
+      .searchwrap{width:100%}
+      .search{width:100%}
+      .search input{flex:1;width:auto;min-width:0}
+
+      /* compact legend, bottom-left */
+      .legend{left:8px;bottom:8px;width:150px;padding:9px 10px;font-size:11px;transform:none}
+      .legend .title{font-size:11px;margin-bottom:6px}
+      .legend .row{margin:2px 0}
+      .legend .sw{width:13px;height:10px}
+      .legend .seg button{font-size:11px;padding:4px 0}
+      .legend .radius{margin-top:8px;padding-top:8px}
+      .legend .toggle{margin-top:8px;padding-top:8px}
+
+      /* condensed info card, bottom-right beside legend */
+      .infocard{top:auto;bottom:8px;right:8px;left:auto;width:calc(100% - 172px);max-width:none;padding:11px 12px}
+      .infocard h2{font-size:11px;margin-bottom:6px}
+      .detail .big{font-size:22px}
+      .detail .big small{font-size:12px}
+      .detail .sub{margin:2px 0 6px}
+      #dMetrics,#dDemo{display:none}          /* reduce info on small screens */
+      #statsHint{font-size:12px;line-height:1.45}
+      .backlink{margin-top:8px}
+
+      .credit{display:none}
     }
   </style>
 </head>
@@ -258,7 +285,7 @@
   function loadPoints(){
     fetch("data/restaurants.geojson").then(r=>r.json()).then(g=>{
       restLayer=L.geoJSON(g,{renderer:restRenderer,pane:"markerPane",
-        pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:3.2,fillColor:"#2563eb",color:"#fff",weight:0.6,fillOpacity:0.9}),
+        pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:5,fillColor:"#2563eb",color:"#fff",weight:1,fillOpacity:0.95}),
         onEachFeature:(f,l)=>l.bindPopup(`<b>${f.properties.name}</b><br><span style="color:#5c6773">Korean restaurant</span>`)});
       if(TAB==="rest" && document.getElementById("ptToggle").checked) restLayer.addTo(map);
     });
@@ -318,7 +345,7 @@
   function selectCounty(geoid,fly){
     const layer=layerByGeoid[geoid]; if(!layer) return;
     if(selectedLayer&&selectedLayer!==layer) selectedLayer.setStyle(BASE);
-    selectedLayer=layer; layer.setStyle(HL); layer.bringToFront&&layer.bringToFront();
+    selectedLayer=layer; layer.setStyle(HL);   // no bringToFront: it corrupts canvas hit-testing
     const p=layer.feature.properties;
     showDetailFor(p,"County",true);
     const c=layer.getBounds().getCenter();
