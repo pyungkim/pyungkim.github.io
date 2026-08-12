@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>K-Food Atlas</title>
+  <meta name="description" content="Korean-food accessibility across the U.S. — Korean restaurant density and distance to the nearest H Mart, by county. Search by county, city, or ZIP." />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    :root{
+      --panel:#ffffff; --ink:#1a1f26; --muted:#5c6773; --line:#e4e8ee;
+      --brand:#e2231a; --accent:#0d8b6f; --shadow:0 6px 24px rgba(16,24,40,.14); --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+    #map{position:absolute;inset:0;background:#eef1f5}
+    .leaflet-container{background:#eef1f5}
+
+    /* Top bar */
+    .topbar{position:absolute;top:14px;left:14px;z-index:1000;display:flex;gap:10px;align-items:flex-start;max-width:calc(100% - 28px)}
+    .brand{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 14px;min-width:0}
+    .brand h1{font-size:17px;margin:0 0 8px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+    .brand h1 .k{color:var(--brand)}
+    .tabs{display:flex;background:#eef1f5;border-radius:10px;padding:3px;gap:2px}
+    .tabs button{border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+    .tabs button.active{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.16)}
+
+    .searchwrap{position:relative}
+    .search{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px;display:flex;align-items:center;gap:8px}
+    .search input{border:none;outline:none;font-size:15px;width:180px;padding:6px 8px;color:var(--ink)}
+    .search input::placeholder{color:#9aa4b0}
+    .search button{border:none;background:var(--ink);color:#fff;font-weight:600;font-size:14px;padding:8px 14px;border-radius:9px;cursor:pointer}
+    .search .err{color:var(--brand);font-size:12px;padding-right:6px;display:none}
+    .suggest{position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--panel);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;display:none;max-height:320px;overflow-y:auto}
+    .suggest .item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line)}
+    .suggest .item:last-child{border-bottom:none}
+    .suggest .item.active,.suggest .item:hover{background:#f2f5f9}
+    .suggest .badge{font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;background:#8a94a0;border-radius:5px;padding:2px 6px;flex:none}
+    .suggest .badge.county{background:#2f6f8f}.suggest .badge.city{background:#6b7280}
+    .suggest .nm{flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .suggest .mi{font-size:12px;color:var(--muted);font-weight:600;flex:none}
+
+    /* Info card */
+    .infocard{position:absolute;top:14px;right:14px;z-index:1000;width:300px;max-width:calc(100% - 28px);background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
+    .infocard h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 10px}
+    .metric{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px;gap:10px}
+    .metric:last-child{border-bottom:none}
+    .metric .v{font-weight:700;font-size:15px;text-align:right}
+    .detail .big{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1}
+    .detail .big small{font-size:14px;font-weight:600;color:var(--muted)}
+    .detail .sub{color:var(--muted);font-size:13px;margin:2px 0 12px}
+    .section{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#9aa4b0;font-weight:700;margin:12px 0 2px}
+    .backlink{margin-top:12px;font-size:12px;color:var(--brand);cursor:pointer}
+
+    /* Legend */
+    .legend{position:absolute;left:14px;bottom:22px;z-index:1000;background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;font-size:12px;width:210px}
+    .legend .title{font-weight:700;margin-bottom:8px;font-size:12px}
+    .legend .row{display:flex;align-items:center;gap:8px;margin:3px 0}
+    .legend .sw{width:16px;height:12px;border-radius:3px;flex:none}
+    .radius{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+    .radius .lab{color:var(--muted);margin-bottom:6px}
+    .seg{display:flex;background:#eef1f5;border-radius:8px;padding:3px;gap:2px}
+    .seg button{flex:1;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:700;padding:5px 0;border-radius:6px;cursor:pointer}
+    .seg button.active{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.16)}
+    .legend .toggle{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;align-items:center;gap:7px;cursor:pointer;color:var(--muted)}
+    .legend .toggle input{accent-color:var(--brand)}
+
+    .loading{position:absolute;inset:0;z-index:2000;background:rgba(255,255,255,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s}
+    .spin{width:38px;height:38px;border:4px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:sp 1s linear infinite}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    .loading p{color:var(--muted);font-size:13px}
+
+    .credit{position:absolute;right:10px;bottom:6px;z-index:1000;font-size:11px;color:#6b7480;background:rgba(255,255,255,.82);padding:4px 10px;border-radius:7px;box-shadow:0 1px 6px rgba(16,24,40,.1);max-width:min(96vw,780px);text-align:right;line-height:1.5}
+    .credit a{color:#3a4658;text-decoration:none;font-weight:600}
+    .credit a:hover{text-decoration:underline}
+    .credit .author{font-size:14px;font-weight:700}
+    .credit .sep{color:#c0c7d0;margin:0 5px}
+
+    /* markers */
+    .hm-cart{width:26px;height:26px;border-radius:7px;background:var(--brand);border:2px solid #fff;box-shadow:0 2px 5px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center}
+    .hm-cart svg{width:15px;height:15px;fill:#fff;display:block}
+    .hm-cart.soon{background:#98a2b3}
+    .hm-pin{position:relative;width:30px;height:42px}
+    .hm-pin .drop{position:absolute;left:3px;top:0;width:24px;height:24px;border-radius:50% 50% 50% 2px;transform:rotate(45deg);background:#1f2a44;border:3px solid #fff;box-shadow:0 3px 7px rgba(16,24,40,.45);z-index:2}
+    .hm-pin .drop::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#fff}
+    .hm-pin .ring{position:absolute;left:5px;top:26px;width:20px;height:8px;border-radius:50%;background:rgba(31,42,68,.28);z-index:1;animation:pulse 1.8s ease-out infinite}
+    @keyframes pulse{0%{transform:scale(.5);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+
+    @media (max-width:640px){
+      .infocard{top:auto;bottom:96px;right:14px;width:calc(100% - 28px);max-width:none}
+      .search input{width:130px}
+      .legend{bottom:14px;transform:scale(.92);transform-origin:left bottom}
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="topbar">
+    <div class="brand">
+      <h1><span class="k">K</span>-Food Atlas</h1>
+      <div class="tabs">
+        <button id="tabHmart" class="active">🛒 H Mart</button>
+        <button id="tabRest">🍜 Korean Restaurants</button>
+      </div>
+    </div>
+    <div class="searchwrap">
+      <div class="search">
+        <input id="q" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="County, city, or ZIP" />
+        <span class="err" id="err">Not found</span>
+        <button id="go">Find</button>
+      </div>
+      <div class="suggest" id="suggest"></div>
+    </div>
+  </div>
+
+  <div class="infocard" id="infocard">
+    <div id="statsView">
+      <h2 id="statsTitle">Korean food access</h2>
+      <p id="statsHint" style="font-size:13px;color:var(--muted);margin:0;line-height:1.55"></p>
+    </div>
+    <div id="detailView" style="display:none">
+      <h2 id="dKind">County</h2>
+      <div class="detail">
+        <div class="big"><span id="dBig"></span> <small id="dBigUnit"></small></div>
+        <div class="sub" id="dTitle"></div>
+      </div>
+      <div id="dMetrics"></div>
+      <div id="dDemo"></div>
+      <div class="backlink" id="dBack">‹ Back</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="seg" id="metricSeg" style="margin-bottom:10px">
+      <button data-m="distance" class="active">Distance</button>
+      <button data-m="density">Density</button>
+    </div>
+    <div class="title" id="legendTitle"></div>
+    <div id="legendRows"></div>
+    <div class="radius" id="radiusBox">
+      <div class="lab">Radius</div>
+      <div class="seg" id="radiusSeg"></div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="ptToggle" /> <span id="ptLabel">Show H Marts</span></label>
+  </div>
+
+  <div class="credit">
+    County-level<span class="sep">·</span>Straight-line distance<span class="sep">·</span>Restaurants: <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a><span class="sep">·</span>
+    Marts: <a href="https://www.hmart.com/stores" target="_blank" rel="noopener">hmart.com</a> (Aug 2026)<span class="sep">·</span>Census ACS<br>
+    <span style="white-space:nowrap">Built by <a class="author" href="https://pyungkim.github.io/" target="_blank" rel="noopener">Pyung Kim</a></span>
+  </div>
+
+  <div class="loading" id="loading"><div class="spin"></div><p id="loadmsg">Loading map data…</p></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+  // ===== Color scales & per-tab/metric config ==============================
+  // Both metrics read the same direction: green = good access, red = poor.
+  const DIST_COLORS = ["#0d8b6f","#4bb391","#93cf8e","#e7c15a","#e79a4e","#d96a3f","#b5372f"]; // near->far
+  const DENS_COLORS = ["#eff3ff","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"]; // few(light)->many(dark blue)
+  const NA_COLOR = "#e6e9ee";
+  // Distance bins are fixed & tuned (H Mart's are larger — people travel farther
+  // for groceries). Density bins are data-driven, per tab+radius, from meta.json.
+  const CFG_DIST = {
+    rest:  { get:p=>p.rd, colors:DIST_COLORS, breaks:[5,10,20,40,75,150],
+             labels:["0–5","5–10","10–20","20–40","40–75","75–150",">150"], unit:" mi",
+             title:()=>"Distance to nearest Korean restaurant" },
+    hmart: { get:p=>p.hd, colors:DIST_COLORS, breaks:[10,25,50,100,200,350],
+             labels:["0–10","10–25","25–50","50–100","100–200","200–350",">350"], unit:" mi",
+             title:()=>"Distance to nearest H Mart" }
+  };
+  function cfg(){
+    if(METRIC==="distance") return CFG_DIST[TAB];
+    const key = TAB==="rest" ? "r" : "h";
+    const b = (META && META.density_bins[TAB][String(RADIUS)]) ||
+              {breaks:[0,1,2,3,4,5], labels:["0","1","2","3","4","5",">5"]};
+    return { get:p=>p[key+RADIUS], colors:DENS_COLORS, breaks:b.breaks, labels:b.labels, unit:"",
+             title:()=>`${TAB==="rest"?"Korean restaurants":"H Marts"} within ${RADIUS} mi` };
+  }
+  function binUp(v, breaks){ if(v===null||v===undefined||isNaN(v)) return -1;
+    for(let i=0;i<breaks.length;i++){ if(v<=breaks[i]) return i; } return breaks.length; }
+  function fmtN(x){ return (x===null||x===undefined||isNaN(x))?"–":Math.round(x).toLocaleString(); }
+  function fmtMi(x){ return (x===null||x===undefined||isNaN(x))?"–":x; }
+
+  // ===== State ==============================================================
+  let TAB = "hmart";        // "rest" | "hmart"  — H Mart is the default view
+  let METRIC = "distance";  // "density" | "distance"  — Distance is the default
+  const METRIC_BY_TAB = {rest:"distance", hmart:"distance"};   // remembered per tab
+  const RADII_BY_TAB  = {rest:[10,25,50], hmart:[25,50,100]};  // density radii per tab
+  const RADIUS_BY_TAB = {rest:25, hmart:50};
+  let RADIUS = RADIUS_BY_TAB[TAB];
+  let META = null;
+  let zipLookup = {}, places = [], countyLayer=null, restLayer=null, storeLayer=null, selMarker=null;
+  const layerByGeoid = {};
+  let hovered=null, selectedLayer=null;
+
+  // ===== Marker icons =======================================================
+  const CART_SVG='<svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 15h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>';
+  function storeIcon(open){ return L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,13],popupAnchor:[0,-15],
+    html:`<div class="hm-cart ${open?'':'soon'}">${CART_SVG}</div>`}); }
+  const searchPin = L.divIcon({className:"",iconSize:[30,42],iconAnchor:[15,40],popupAnchor:[0,-38],
+    html:`<div class="hm-pin"><div class="ring"></div><div class="drop"></div></div>`});
+
+  // ===== Map ================================================================
+  const CONUS=[[24.4,-124.8],[49.4,-66.9]];
+  const map=L.map("map",{preferCanvas:true,zoomControl:false,minZoom:3,maxZoom:14});
+  map.fitBounds(CONUS);
+  L.control.zoom({position:"bottomright"}).addTo(map);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",{attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:"abcd",maxZoom:19}).addTo(map);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,pane:"markerPane"}).addTo(map);
+  map.createPane("statelines"); map.getPane("statelines").style.zIndex=450; map.getPane("statelines").style.pointerEvents="none";
+  const canvasRenderer=L.canvas({padding:0.5});
+  const restRenderer=L.canvas({padding:0.5});
+  const BASE={weight:0.4,color:"#ffffff",opacity:0.6}, HL={weight:1.8,color:"#111827",opacity:1};
+
+  // ===== Metric accessors ===================================================
+  function countyColor(p){ const c=cfg(); const i=binUp(c.get(p),c.breaks); return i<0?NA_COLOR:c.colors[i]; }
+  function styleFn(f){ return Object.assign({fillColor:countyColor(f.properties),fillOpacity:0.82}, BASE); }
+
+  // ===== Legend =============================================================
+  function renderLegend(){
+    const c=cfg();
+    document.getElementById("legendTitle").textContent=c.title();
+    // highest value on top
+    document.getElementById("legendRows").innerHTML =
+      c.colors.map((col,i)=>`<div class="row"><span class="sw" style="background:${col}"></span><span>${c.labels[i]}${c.unit}</span></div>`)
+       .reverse().join("");
+  }
+
+  // ===== Load ===============================================================
+  const loadmsg=document.getElementById("loadmsg");
+  Promise.all([
+    fetch("data/meta.json").then(r=>r.json()),
+    fetch("data/zip_lookup.json").then(r=>r.json()),
+    fetch("data/places_index.json").then(r=>r.json()),
+  ]).then(([meta,zl,pl])=>{
+    zipLookup=zl; places=pl; META=meta; window.__meta=meta;
+    document.getElementById("statsHint").innerHTML =
+      `${meta.n_restaurants.toLocaleString()} Korean restaurants · ${meta.n_stores} H Marts. `+
+      `Hover a county — or search a <b>county</b>, <b>city</b>, or <b>ZIP</b> — for details.`;
+    loadmsg.textContent="Loading county map…";
+    return fetch("data/county.geojson").then(r=>r.json());
+  }).then(geo=>{
+    countyLayer=L.geoJSON(geo,{renderer:canvasRenderer,style:styleFn,
+      onEachFeature:(f,layer)=>{ layerByGeoid[f.properties.g]=layer;
+        layer.on("mouseover",()=>countyOver(f,layer));
+        layer.on("click",()=>selectCounty(f.properties.g,true)); }
+    }).addTo(map);
+    fetch("data/states.geojson").then(r=>r.json()).then(s=>{
+      L.geoJSON(s,{renderer:L.svg({pane:"statelines"}),interactive:false,style:{fill:false,color:"#3b4452",weight:1,opacity:0.6}}).addTo(map);
+    });
+    setTab(TAB); fadeOut(); loadPoints();
+  }).catch(e=>{ loadmsg.textContent="Failed to load data: "+e; console.error(e); });
+
+  function loadPoints(){
+    fetch("data/restaurants.geojson").then(r=>r.json()).then(g=>{
+      restLayer=L.geoJSON(g,{renderer:restRenderer,pane:"markerPane",
+        pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:3.2,fillColor:"#2563eb",color:"#fff",weight:0.6,fillOpacity:0.9}),
+        onEachFeature:(f,l)=>l.bindPopup(`<b>${f.properties.name}</b><br><span style="color:#5c6773">Korean restaurant</span>`)});
+      if(TAB==="rest" && document.getElementById("ptToggle").checked) restLayer.addTo(map);
+    });
+    fetch("data/stores.geojson").then(r=>r.json()).then(g=>{
+      storeLayer=L.geoJSON(g,{pane:"markerPane",
+        pointToLayer:(f,ll)=>L.marker(ll,{icon:storeIcon(f.properties.status==="open"),keyboard:false,riseOnHover:true}),
+        onEachFeature:(f,l)=>{const p=f.properties;const s=p.status!=="open"?' <em>(coming soon)</em>':'';
+          l.bindPopup(`<b>H Mart ${p.name}</b>${s}<br>${p.street?p.street+"<br>":""}${p.city}, ${p.state} ${p.zip}`);}});
+      if(TAB==="hmart" && document.getElementById("ptToggle").checked) storeLayer.addTo(map);
+    });
+  }
+  function activePointLayer(){ return TAB==="rest"?restLayer:storeLayer; }
+  function refreshPoints(){
+    [restLayer,storeLayer].forEach(l=>{ if(l&&map.hasLayer(l)) map.removeLayer(l); });
+    const l=activePointLayer(); if(l && document.getElementById("ptToggle").checked) l.addTo(map);
+  }
+  document.getElementById("ptToggle").addEventListener("change",refreshPoints);
+
+  // ===== Tabs, metric, radius ==============================================
+  const radiusBox=document.getElementById("radiusBox"), radiusSeg=document.getElementById("radiusSeg");
+  function renderRadiusSeg(){
+    radiusSeg.innerHTML = RADII_BY_TAB[TAB].map(r=>
+      `<button data-r="${r}" class="${r===RADIUS?'active':''}">${r} mi</button>`).join("");
+  }
+  function updateRadiusVisibility(){ radiusBox.style.display = (METRIC==="density") ? "block" : "none"; }
+  function recolor(){ if(countyLayer) countyLayer.setStyle(styleFn); }
+  function refreshDetail(){ if(currentProps) showDetailFor(currentProps,currentKind,currentCounty); }
+
+  function setTab(t){
+    TAB=t; METRIC=METRIC_BY_TAB[t]; RADIUS=RADIUS_BY_TAB[t];
+    document.getElementById("tabRest").classList.toggle("active",t==="rest");
+    document.getElementById("tabHmart").classList.toggle("active",t==="hmart");
+    document.querySelectorAll("#metricSeg button").forEach(x=>x.classList.toggle("active",x.dataset.m===METRIC));
+    document.getElementById("ptLabel").textContent = t==="rest"?"Show restaurants":"Show H Marts";
+    renderRadiusSeg(); updateRadiusVisibility();
+    recolor(); renderLegend(); refreshPoints(); refreshDetail();
+  }
+  function setMetric(m){ METRIC=m; METRIC_BY_TAB[TAB]=m;
+    document.querySelectorAll("#metricSeg button").forEach(x=>x.classList.toggle("active",x.dataset.m===m));
+    updateRadiusVisibility(); recolor(); renderLegend(); refreshDetail();
+  }
+  function setRadius(r){ RADIUS=r; RADIUS_BY_TAB[TAB]=r;
+    document.querySelectorAll("#radiusSeg button").forEach(x=>x.classList.toggle("active",+x.dataset.r===r));
+    if(METRIC==="density") recolor(); renderLegend(); refreshDetail();
+  }
+  document.getElementById("tabRest").onclick=()=>setTab("rest");
+  document.getElementById("tabHmart").onclick=()=>setTab("hmart");
+  document.getElementById("metricSeg").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) setMetric(b.dataset.m); });
+  radiusSeg.addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) setRadius(+b.dataset.r); });
+
+  // ===== Hover / select =====================================================
+  function countyOver(f,layer){
+    if(hovered && hovered!==layer && hovered!==selectedLayer) hovered.setStyle(BASE);
+    hovered=layer; if(layer!==selectedLayer) layer.setStyle(HL);
+    showDetailFor(f.properties,"County",true);
+  }
+  function selectCounty(geoid,fly){
+    const layer=layerByGeoid[geoid]; if(!layer) return;
+    if(selectedLayer&&selectedLayer!==layer) selectedLayer.setStyle(BASE);
+    selectedLayer=layer; layer.setStyle(HL); layer.bringToFront&&layer.bringToFront();
+    const p=layer.feature.properties;
+    showDetailFor(p,"County",true);
+    const c=layer.getBounds().getCenter();
+    placePin(c.lat,c.lng,`<b>${p.nm}, ${p.st}</b>`);
+    if(fly) map.fitBounds(layer.getBounds().pad(0.15),{maxZoom:9});
+  }
+
+  // ===== Info panel =========================================================
+  const statsView=document.getElementById("statsView"), detailView=document.getElementById("detailView");
+  let currentProps=null,currentKind=null,currentCounty=false;
+  function metricRow(label,val){ return `<div class="metric"><span>${label}</span><span class="v">${val}</span></div>`; }
+  function showDetailFor(p,kind,isCounty){
+    currentProps=p; currentKind=kind; currentCounty=isCounty;
+    statsView.style.display="none"; detailView.style.display="block";
+    document.getElementById("dKind").textContent=kind;
+    document.getElementById("dTitle").textContent = p.nm ? `${p.nm}, ${p.st}` : (p.__title||"");
+    const big=document.getElementById("dBig"), unit=document.getElementById("dBigUnit"), rows=document.getElementById("dMetrics");
+    if(METRIC==="density"){
+      if(TAB==="rest"){ big.textContent=fmtN(p["r"+RADIUS]); unit.textContent=`Korean restaurants within ${RADIUS} mi`; }
+      else { big.textContent=fmtN(p["h"+RADIUS]); unit.textContent=`H Marts within ${RADIUS} mi`; }
+    } else {
+      if(TAB==="rest"){ big.textContent=fmtMi(p.rd); unit.textContent="mi to nearest restaurant"; }
+      else { big.textContent=fmtMi(p.hd); unit.textContent="mi to nearest H Mart"; }
+    }
+    rows.innerHTML = (TAB==="rest")
+      ? metricRow("Nearest Korean restaurant", fmtMi(p.rd)+" mi")
+        + metricRow(`Korean restaurants within ${RADIUS} mi`, fmtN(p["r"+RADIUS]))
+        + metricRow("Nearest H Mart", fmtMi(p.hd)+" mi"+(p.hs?` · ${p.hs}`:""))
+      : metricRow("Nearest H Mart", fmtMi(p.hd)+" mi"+(p.hs?` · ${p.hs}`:""))
+        + metricRow(`H Marts within ${RADIUS} mi`, fmtN(p["h"+RADIUS]))
+        + metricRow("Nearest Korean restaurant", fmtMi(p.rd)+" mi");
+    const demo=document.getElementById("dDemo");
+    if(isCounty && (p.pop!==undefined)){
+      const has = p.pop!==null && p.pop!==undefined;
+      demo.innerHTML = `<div class="section">County population</div>`
+        + metricRow("Total", has?fmtN(p.pop):"– <span style='font-size:11px;color:#9aa4b0'>(add Census key)</span>")
+        + metricRow("Asian", has?fmtN(p.asn):"–")
+        + metricRow("Korean", has?fmtN(p.kor):"–");
+    } else demo.innerHTML="";
+  }
+  document.getElementById("dBack").onclick=resetView;
+  function resetView(){
+    detailView.style.display="none"; statsView.style.display="block"; currentProps=null;
+    if(selectedLayer){selectedLayer.setStyle(BASE);selectedLayer=null;}
+    if(hovered){hovered.setStyle(BASE);hovered=null;}
+    if(selMarker){map.removeLayer(selMarker);selMarker=null;}
+  }
+  function placePin(la,lo,html){ if(selMarker) map.removeLayer(selMarker);
+    selMarker=L.marker([la,lo],{icon:searchPin,zIndexOffset:1000}).addTo(map).bindPopup(html).openPopup(); }
+
+  // ===== Search =============================================================
+  const qEl=document.getElementById("q"), errEl=document.getElementById("err"), sug=document.getElementById("suggest");
+  let matches=[], activeIdx=-1;
+  const isZip=s=>/^\d{1,5}$/.test(s);
+  function searchPlaces(q){ const ql=q.toLowerCase(); const pre=[],sub=[];
+    for(const p of places){ if(p.k.startsWith(ql)) pre.push(p); else if(p.k.indexOf(ql)>=0) sub.push(p); if(pre.length>=8) break; }
+    return pre.concat(sub).slice(0,8); }
+  function metricForList(p){ return TAB==="rest" ? (fmtN(p["r"+RADIUS])+" ⌾") : (fmtMi(p.hd)+" mi"); }
+  function renderSuggest(){
+    if(!matches.length){ sug.style.display="none"; return; }
+    sug.innerHTML=matches.map((m,i)=>`<div class="item ${i===activeIdx?'active':''}" data-i="${i}"><span class="badge ${m.t}">${m.t}</span><span class="nm">${m.n}</span><span class="mi">${metricForList(m)}</span></div>`).join("");
+    sug.style.display="block";
+    sug.querySelectorAll(".item").forEach(el=>el.addEventListener("mousedown",ev=>{ev.preventDefault();choosePlace(matches[+el.dataset.i]);}));
+  }
+  function hideSuggest(){ sug.style.display="none"; matches=[]; activeIdx=-1; }
+  qEl.addEventListener("input",()=>{ errEl.style.display="none"; const q=qEl.value.trim();
+    if(q===""||isZip(q)){ hideSuggest(); return; } matches=searchPlaces(q); activeIdx=matches.length?0:-1; renderSuggest(); });
+  qEl.addEventListener("keydown",e=>{
+    if(sug.style.display==="block"&&matches.length){
+      if(e.key==="ArrowDown"){e.preventDefault();activeIdx=(activeIdx+1)%matches.length;renderSuggest();return;}
+      if(e.key==="ArrowUp"){e.preventDefault();activeIdx=(activeIdx-1+matches.length)%matches.length;renderSuggest();return;}}
+    if(e.key==="Enter"){e.preventDefault();submit();} if(e.key==="Escape") hideSuggest(); });
+  document.getElementById("go").onclick=submit;
+  document.addEventListener("click",e=>{ if(!e.target.closest(".searchwrap")) hideSuggest(); });
+  function submit(){ const q=qEl.value.trim(); if(q==="") return;
+    if(isZip(q)){ doZip(q); return; }
+    if(matches.length){ choosePlace(matches[Math.max(0,activeIdx)]); return; }
+    const m=searchPlaces(q); if(m.length) choosePlace(m[0]); else errEl.style.display="inline"; }
+  function doZip(q){ const z=q.padStart(5,"0"); const rec=zipLookup[z]; if(!rec){ errEl.style.display="inline"; return; }
+    hideSuggest(); const p=Object.assign({__title:(rec.c?rec.c+", ":"")+rec.st}, rec);
+    showDetailFor(p,"ZIP "+z,false); map.setView([rec.la,rec.lo],10); placePin(rec.la,rec.lo,`<b>ZIP ${z}</b> — ${rec.c?rec.c+", ":""}${rec.st}`); }
+  function choosePlace(p){ hideSuggest(); qEl.value=p.n;
+    if(p.t==="county"&&p.g&&layerByGeoid[p.g]){ selectCounty(p.g,true); return; }
+    const pp=Object.assign({__title:p.n},p); showDetailFor(pp, p.t==="county"?"County":"City", p.t==="county");
+    map.setView([p.la,p.lo], p.t==="county"?8:10); placePin(p.la,p.lo,`<b>${p.n}</b>`); }
+
+  function fadeOut(){ const el=document.getElementById("loading"); el.style.opacity="0"; setTimeout(()=>el.remove(),450); }
+  </script>
+</body>
+</html>
