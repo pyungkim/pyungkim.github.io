@@ -81,6 +81,8 @@
     .hm-cart{width:26px;height:26px;border-radius:7px;background:var(--brand);border:2px solid #fff;box-shadow:0 2px 5px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center}
     .hm-cart svg{width:15px;height:15px;fill:#fff;display:block}
     .hm-cart.soon{background:#98a2b3}
+    .kg-cart{width:24px;height:24px;border-radius:7px;background:#0d8b6f;border:2px solid #fff;box-shadow:0 2px 5px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center}
+    .kg-cart svg{width:14px;height:14px;fill:#fff;display:block}
     .kr-rice{width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid #2563eb;
       box-shadow:0 1px 3px rgba(16,24,40,.4);display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1}
     /* larger invisible tap target around the 20px badge (easier on touch) */
@@ -133,7 +135,8 @@
       <h1><span class="k">K</span>-Food Atlas</h1>
       <div class="tabs">
         <button id="tabHmart" class="active">🛒 H Mart</button>
-        <button id="tabRest">🍜 Korean Restaurants</button>
+        <button id="tabGrocery">🏪 Grocery</button>
+        <button id="tabRest">🍜 Restaurants</button>
       </div>
     </div>
     <div class="searchwrap">
@@ -178,9 +181,9 @@
   </div>
 
   <div class="credit">
-    County-level<span class="sep">·</span>Straight-line distance<span class="sep">·</span>Restaurants: <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a><span class="sep">·</span>
-    Marts: <a href="https://www.hmart.com/stores" target="_blank" rel="noopener">hmart.com</a> (Aug 2026)<span class="sep">·</span>Census ACS<br>
-    <span style="white-space:nowrap">Built by <a class="author" href="https://pyungkim.github.io/" target="_blank" rel="noopener">Pyung Kim</a></span>
+    County-level<span class="sep">·</span>Straight-line distance<span class="sep">·</span>Data: <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a>, <a href="https://www.hmart.com/stores" target="_blank" rel="noopener">hmart.com</a>, Census ACS<br>
+    Korean grocery = Korean-named grocers (OSM) + H Mart — not exhaustive<br>
+    <span style="white-space:nowrap">Built by <a class="author" href="https://pyungkim.github.io/" target="_blank" rel="noopener">Pyung Kim</a> · Updated Aug 12, 2026</span>
   </div>
 
   <div class="loading" id="loading"><div class="spin"></div><p id="loadmsg">Loading map data…</p></div>
@@ -195,21 +198,26 @@
   const NA_COLOR = "#e6e9ee";
   // Distance bins are fixed & tuned (H Mart's are larger — people travel farther
   // for groceries). Density bins are data-driven, per tab+radius, from meta.json.
+  const KEY   = {rest:"r", hmart:"h", grocery:"k"};
+  const LABEL = {rest:"Korean restaurants", hmart:"H Marts", grocery:"Korean groceries"};
+  const NEAR  = {rest:"restaurant", hmart:"H Mart", grocery:"Korean grocery"};
   const CFG_DIST = {
-    rest:  { get:p=>p.rd, colors:DIST_COLORS, breaks:[5,10,20,40,75,150],
-             labels:["0–5","5–10","10–20","20–40","40–75","75–150",">150"], unit:" mi",
-             title:()=>"Distance to nearest Korean restaurant" },
-    hmart: { get:p=>p.hd, colors:DIST_COLORS, breaks:[10,25,50,100,200,350],
-             labels:["0–10","10–25","25–50","50–100","100–200","200–350",">350"], unit:" mi",
-             title:()=>"Distance to nearest H Mart" }
+    rest:    { get:p=>p.rd, colors:DIST_COLORS, breaks:[5,10,20,40,75,150],
+               labels:["0–5","5–10","10–20","20–40","40–75","75–150",">150"], unit:" mi",
+               title:()=>"Distance to nearest Korean restaurant" },
+    hmart:   { get:p=>p.hd, colors:DIST_COLORS, breaks:[10,25,50,100,200,350],
+               labels:["0–10","10–25","25–50","50–100","100–200","200–350",">350"], unit:" mi",
+               title:()=>"Distance to nearest H Mart" },
+    grocery: { get:p=>p.kd, colors:DIST_COLORS, breaks:[10,25,50,100,200,350],
+               labels:["0–10","10–25","25–50","50–100","100–200","200–350",">350"], unit:" mi",
+               title:()=>"Distance to nearest Korean grocery" }
   };
   function cfg(){
     if(METRIC==="distance") return CFG_DIST[TAB];
-    const key = TAB==="rest" ? "r" : "h";
     const b = (META && META.density_bins[TAB][String(RADIUS)]) ||
               {breaks:[0,1,2,3,4,5], labels:["0","1","2","3","4","5",">5"]};
-    return { get:p=>p[key+RADIUS], colors:DENS_COLORS, breaks:b.breaks, labels:b.labels, unit:"",
-             title:()=>`${TAB==="rest"?"Korean restaurants":"H Marts"} within ${RADIUS} mi` };
+    return { get:p=>p[KEY[TAB]+RADIUS], colors:DENS_COLORS, breaks:b.breaks, labels:b.labels, unit:"",
+             title:()=>`${LABEL[TAB]} within ${RADIUS} mi` };
   }
   function binUp(v, breaks){ if(v===null||v===undefined||isNaN(v)) return -1;
     for(let i=0;i<breaks.length;i++){ if(v<=breaks[i]) return i; } return breaks.length; }
@@ -219,12 +227,12 @@
   // ===== State ==============================================================
   let TAB = "hmart";        // "rest" | "hmart"  — H Mart is the default view
   let METRIC = "distance";  // "density" | "distance"  — Distance is the default
-  const METRIC_BY_TAB = {rest:"distance", hmart:"distance"};   // remembered per tab
-  const RADII_BY_TAB  = {rest:[10,25,50], hmart:[25,50,100]};  // density radii per tab
-  const RADIUS_BY_TAB = {rest:25, hmart:50};
+  const METRIC_BY_TAB = {rest:"distance", hmart:"distance", grocery:"distance"};
+  const RADII_BY_TAB  = {rest:[10,25,50], hmart:[25,50,100], grocery:[25,50,100]};
+  const RADIUS_BY_TAB = {rest:25, hmart:50, grocery:50};
   let RADIUS = RADIUS_BY_TAB[TAB];
   let META = null;
-  let zipLookup = {}, places = [], countyLayer=null, restLayer=null, storeLayer=null, selMarker=null;
+  let zipLookup = {}, places = [], countyLayer=null, restLayer=null, storeLayer=null, grocLayer=null, selMarker=null;
   const layerByGeoid = {};
   let hovered=null, selectedLayer=null;
 
@@ -235,6 +243,7 @@
   const searchPin = L.divIcon({className:"",iconSize:[30,42],iconAnchor:[15,40],popupAnchor:[0,-38],
     html:`<div class="hm-pin"><div class="ring"></div><div class="drop"></div></div>`});
   const riceIcon = L.divIcon({className:"kr-rice-hit",iconSize:[32,32],iconAnchor:[16,16],popupAnchor:[0,-13],html:'<div class="kr-rice">🍚</div>'});
+  const groceryIcon = L.divIcon({className:"",iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14],html:`<div class="kg-cart">${CART_SVG}</div>`});
 
   // ===== Map ================================================================
   const CONUS=[[24.4,-124.8],[49.4,-66.9]];
@@ -304,6 +313,12 @@
           l.bindPopup(`<b>H Mart ${p.name}</b>${s}<br>${p.street?p.street+"<br>":""}${p.city}, ${p.state} ${p.zip}`);}});
       refreshPoints();
     });
+    fetch("data/groceries.geojson").then(r=>r.json()).then(g=>{
+      grocLayer=L.geoJSON(g,{pane:"markerPane",
+        pointToLayer:(f,ll)=>L.marker(ll,{icon:groceryIcon,keyboard:false,riseOnHover:true}),
+        onEachFeature:(f,l)=>l.bindPopup(`<b>${f.properties.name}</b><br><span style="color:#5c6773">Korean grocery</span>`)});
+      refreshPoints();
+    });
   }
   function restOn(){ return TAB==="rest" && document.getElementById("ptToggle").checked; }
   function bigScreen(){ return window.innerWidth >= 900; }  // desktop: show all zooms; mobile: cull
@@ -326,8 +341,9 @@
     }
   }
   function refreshPoints(){
-    if(storeLayer){ if(TAB==="hmart" && document.getElementById("ptToggle").checked) storeLayer.addTo(map);
-                    else if(map.hasLayer(storeLayer)) map.removeLayer(storeLayer); }
+    const on=document.getElementById("ptToggle").checked;
+    if(storeLayer){ if(TAB==="hmart" && on) storeLayer.addTo(map); else if(map.hasLayer(storeLayer)) map.removeLayer(storeLayer); }
+    if(grocLayer){ if(TAB==="grocery" && on) grocLayer.addTo(map); else if(map.hasLayer(grocLayer)) map.removeLayer(grocLayer); }
     updateRest();
   }
   document.getElementById("ptToggle").addEventListener("change",refreshPoints);
@@ -348,8 +364,9 @@
     TAB=t; METRIC=METRIC_BY_TAB[t]; RADIUS=RADIUS_BY_TAB[t];
     document.getElementById("tabRest").classList.toggle("active",t==="rest");
     document.getElementById("tabHmart").classList.toggle("active",t==="hmart");
+    document.getElementById("tabGrocery").classList.toggle("active",t==="grocery");
     document.querySelectorAll("#metricSeg button").forEach(x=>x.classList.toggle("active",x.dataset.m===METRIC));
-    document.getElementById("ptLabel").textContent = t==="rest"?"Show restaurants":"Show H Marts";
+    document.getElementById("ptLabel").textContent = t==="rest"?"Show restaurants":t==="hmart"?"Show H Marts":"Show groceries";
     renderRadiusSeg(); updateRadiusVisibility();
     recolor(); renderLegend(); refreshPoints(); refreshDetail();
   }
@@ -363,6 +380,7 @@
   }
   document.getElementById("tabRest").onclick=()=>setTab("rest");
   document.getElementById("tabHmart").onclick=()=>setTab("hmart");
+  document.getElementById("tabGrocery").onclick=()=>setTab("grocery");
   document.getElementById("metricSeg").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) setMetric(b.dataset.m); });
   radiusSeg.addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) setRadius(+b.dataset.r); });
 
@@ -393,20 +411,14 @@
     document.getElementById("dKind").textContent=kind;
     document.getElementById("dTitle").textContent = p.nm ? `${p.nm}, ${p.st}` : (p.__title||"");
     const big=document.getElementById("dBig"), unit=document.getElementById("dBigUnit"), rows=document.getElementById("dMetrics");
-    if(METRIC==="density"){
-      if(TAB==="rest"){ big.textContent=fmtN(p["r"+RADIUS]); unit.textContent=`Korean restaurants within ${RADIUS} mi`; }
-      else { big.textContent=fmtN(p["h"+RADIUS]); unit.textContent=`H Marts within ${RADIUS} mi`; }
-    } else {
-      if(TAB==="rest"){ big.textContent=fmtMi(p.rd); unit.textContent="mi to nearest restaurant"; }
-      else { big.textContent=fmtMi(p.hd); unit.textContent="mi to nearest H Mart"; }
-    }
-    rows.innerHTML = (TAB==="rest")
-      ? metricRow("Nearest Korean restaurant", fmtMi(p.rd)+" mi")
-        + metricRow(`Korean restaurants within ${RADIUS} mi`, fmtN(p["r"+RADIUS]))
-        + metricRow("Nearest H Mart", fmtMi(p.hd)+" mi"+(p.hs?` · ${p.hs}`:""))
-      : metricRow("Nearest H Mart", fmtMi(p.hd)+" mi"+(p.hs?` · ${p.hs}`:""))
-        + metricRow(`H Marts within ${RADIUS} mi`, fmtN(p["h"+RADIUS]))
-        + metricRow("Nearest Korean restaurant", fmtMi(p.rd)+" mi");
+    const nearD = {rest:p.rd, hmart:p.hd, grocery:p.kd}[TAB];
+    if(METRIC==="density"){ big.textContent=fmtN(p[KEY[TAB]+RADIUS]); unit.textContent=`${LABEL[TAB]} within ${RADIUS} mi`; }
+    else { big.textContent=fmtMi(nearD); unit.textContent=`mi to nearest ${NEAR[TAB]}`; }
+    rows.innerHTML =
+        metricRow("Nearest Korean restaurant", fmtMi(p.rd)+" mi")
+      + metricRow("Nearest Korean grocery", fmtMi(p.kd)+" mi")
+      + metricRow("Nearest H Mart", fmtMi(p.hd)+" mi"+(p.hs?` · ${p.hs}`:""))
+      + metricRow(`${LABEL[TAB]} within ${RADIUS} mi`, fmtN(p[KEY[TAB]+RADIUS]));
     const demo=document.getElementById("dDemo");
     if(isCounty && (p.pop!==undefined)){
       const has = p.pop!==null && p.pop!==undefined;
@@ -433,7 +445,10 @@
   function searchPlaces(q){ const ql=q.toLowerCase(); const pre=[],sub=[];
     for(const p of places){ if(p.k.startsWith(ql)) pre.push(p); else if(p.k.indexOf(ql)>=0) sub.push(p); if(pre.length>=8) break; }
     return pre.concat(sub).slice(0,8); }
-  function metricForList(p){ return TAB==="rest" ? (fmtN(p["r"+RADIUS])+" ⌾") : (fmtMi(p.hd)+" mi"); }
+  function metricForList(p){
+    if(METRIC==="density") return fmtN(p[KEY[TAB]+RADIUS]);
+    return fmtMi({rest:p.rd,hmart:p.hd,grocery:p.kd}[TAB])+" mi";
+  }
   function renderSuggest(){
     if(!matches.length){ sug.style.display="none"; return; }
     sug.innerHTML=matches.map((m,i)=>`<div class="item ${i===activeIdx?'active':''}" data-i="${i}"><span class="badge ${m.t}">${m.t}</span><span class="nm">${m.n}</span><span class="mi">${metricForList(m)}</span></div>`).join("");
