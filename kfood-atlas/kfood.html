@@ -252,9 +252,9 @@
   L.control.zoom({position:"bottomright"}).addTo(map);
   // Esri Light Gray Canvas — clean light basemap, no API key required
   L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-    {attribution:'Tiles &copy; Esri', maxZoom:18, maxNativeZoom:16}).addTo(map);
+    {attribution:'Tiles &copy; Esri', maxZoom:18, maxNativeZoom:16, detectRetina:true}).addTo(map);
   L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
-    {maxZoom:18, maxNativeZoom:16, pane:"markerPane"}).addTo(map);
+    {maxZoom:18, maxNativeZoom:16, pane:"markerPane", detectRetina:true}).addTo(map);
   map.createPane("statelines"); map.getPane("statelines").style.zIndex=450; map.getPane("statelines").style.pointerEvents="none";
   const canvasRenderer=L.canvas({padding:0.5});
   const restRenderer=L.canvas({padding:0.5});
