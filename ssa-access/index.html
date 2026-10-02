@@ -83,7 +83,7 @@
   <div class="topbar">
     <div class="brand">
       <h1><span class="dot"></span>Access to SSA Field Offices</h1>
-      <p id="brandsub">Office supply vs. population demand, travel-time weighted (E2SFCA)</p>
+      <p id="brandsub">Office availability per resident, weighted by travel time (E2SFCA)</p>
     </div>
     <div class="searchwrap">
       <div class="search">
@@ -166,7 +166,8 @@
   L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",{attribution:'Tiles &copy; Esri',maxZoom:16,detectRetina:true}).addTo(map);
   L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,pane:"markerPane",detectRetina:true}).addTo(map);
   map.createPane("statelines"); map.getPane("statelines").style.zIndex=450; map.getPane("statelines").style.pointerEvents="none";
-  const canvasRenderer=L.canvas({padding:0.5}), offRenderer=L.canvas({padding:0.5});
+  map.createPane("offices"); map.getPane("offices").style.zIndex=460;
+  const canvasRenderer=L.canvas({padding:0.5}), offRenderer=L.svg({padding:0.5,pane:"offices"});
   const BASE={weight:0.4,color:"#ffffff",opacity:0.6}, HL={weight:1.8,color:"#111827",opacity:1};
   function styleFn(f){ return Object.assign({fillColor:colorFor(f.properties),fillOpacity:0.85}, BASE); }
 
@@ -204,7 +205,7 @@
   function loadOffices(){
     fetch("data/offices.geojson").then(r=>r.json()).then(g=>{
       offLayer=L.geoJSON(g,{renderer:offRenderer,pane:"markerPane",
-        pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:3.2,fillColor:"#1f4e79",color:"#fff",weight:0.7,fillOpacity:0.95}),
+        pointToLayer:(f,ll)=>L.circleMarker(ll,{renderer:offRenderer,pane:"offices",radius:3.2,fillColor:"#1f4e79",color:"#fff",weight:0.7,fillOpacity:0.95}),
         onEachFeature:(f,l)=>l.bindPopup(`<b>SSA field office</b><br><span style="color:#5c6773">${f.properties.addr||""}</span>`)});
       if(document.getElementById("offToggle").checked) offLayer.addTo(map);
     });
